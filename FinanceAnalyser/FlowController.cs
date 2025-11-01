@@ -2,13 +2,15 @@
 
 namespace FinanceAnalyser
 {
-    public class FlowController(ICsvReaderService _csvReader) : IFlowController
+    public class FlowController(ICsvReaderService _csvReader, IHuggingFaceCategoriser _categoriser) : IFlowController
     {
-        public void StartFlow()
+        public async Task StartFlowAsync()
         {
             Console.WriteLine("STARTING BANK STATEMENT ANALYSIS");
 
-            ReadCsvFile();
+            //ReadCsvFile();
+            //await _categoriser.CategoriseAsync("Test transaction for categorisation");
+            await _categoriser.CategoriseAsync();
 
             Console.WriteLine("FINISHING BANK STATEMENT ANALYSIS");
         }

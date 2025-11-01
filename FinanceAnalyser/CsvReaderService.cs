@@ -9,10 +9,10 @@ namespace FinanceAnalyser
             // Get lines from CSV file
             var lines = File.ReadAllLines(filePath);
 
-            foreach (var line in lines)
-            {
-                Console.WriteLine(line);
-            }
+            //foreach (var line in lines)
+            //{
+            //    Console.WriteLine(line);
+            //}
 
             // Assume first line is headers
             var headers = lines[0].Split(',');

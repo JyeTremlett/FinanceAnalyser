@@ -2,6 +2,6 @@
 {
     public interface IFlowController
     {
-        void StartFlow();
+        Task StartFlowAsync();
     }
 }

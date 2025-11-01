@@ -7,12 +7,19 @@ namespace FinanceAnalyser
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var builder = Host.CreateApplicationBuilder(args);
 
+            // Add config and app secrets
+            builder.Configuration.AddUserSecrets<Program>();
+
+            // Register services
             builder.Services.AddSingleton<FlowController>();
+            builder.Services.AddSingleton(builder.Configuration);
+
             builder.Services.AddScoped<ICsvReaderService, CsvReaderService>();
+            builder.Services.AddScoped<IHuggingFaceCategoriser, HuggingFaceCategoriser>();
 
             var host = builder.Build();
 
@@ -21,11 +28,11 @@ namespace FinanceAnalyser
                 .AddUserSecrets<Program>()
                 .Build();
 
-            string fakeTestToken = config.GetValue<string>("fakeTestToken") ?? throw new InvalidOperationException("Could not get user secrets");
+            //string fakeTestToken = config.GetValue<string>("fakeTestToken") ?? throw new InvalidOperationException("Could not get user secrets");
 
             // Start app
             var app = host.Services.GetRequiredService<FlowController>();
-            app.StartFlow();
+            await app.StartFlowAsync();
         }
     }
 }

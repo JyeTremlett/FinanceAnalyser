@@ -1,4 +1,5 @@
 ﻿public interface IHuggingFaceCategoriser
 {
-    Task<string> CategoriseAsync(string transaction);
+    Task<string> CategoriseAsync();
+    Task AltCategoriseAsync();
 }
