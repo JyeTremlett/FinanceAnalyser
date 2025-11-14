@@ -1,4 +1,6 @@
-﻿public interface IHuggingFaceCategoriser
+﻿using FinanceAnalyser.Entities;
+
+public interface IHuggingFaceCategoriser
 {
-    Task<string> CategoriseAsync();
+    Task<string> CategoriseAsync(IEnumerable<Row> inputList);
 }
