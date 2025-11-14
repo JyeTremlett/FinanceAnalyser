@@ -1,7 +1,9 @@
-﻿namespace FinanceAnalyser.Interfaces
+﻿using FinanceAnalyser.Entities;
+
+namespace FinanceAnalyser.Interfaces
 {
     public interface ICsvReaderService
     {
-        void ReadCsvFile(string filePath);
+        IEnumerable<Row> ReadCsvFile(string filePath);
     }
 }

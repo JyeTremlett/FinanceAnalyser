@@ -28,8 +28,6 @@ namespace FinanceAnalyser
                 .AddUserSecrets<Program>()
                 .Build();
 
-            //string fakeTestToken = config.GetValue<string>("fakeTestToken") ?? throw new InvalidOperationException("Could not get user secrets");
-
             // Start app
             var app = host.Services.GetRequiredService<FlowController>();
             await app.StartFlowAsync();

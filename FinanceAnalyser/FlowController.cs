@@ -1,4 +1,5 @@
-﻿using FinanceAnalyser.Interfaces;
+﻿using FinanceAnalyser.Entities;
+using FinanceAnalyser.Interfaces;
 
 namespace FinanceAnalyser
 {
@@ -8,16 +9,10 @@ namespace FinanceAnalyser
         {
             Console.WriteLine("STARTING BANK STATEMENT ANALYSIS");
 
-            //ReadCsvFile();
-            //await _categoriser.CategoriseAsync("Test transaction for categorisation");
-            await _categoriser.CategoriseAsync();
+            var csv = _csvReader.ReadCsvFile("C:/Users/jyetr/Downloads/StatementCsv (1).csv");
+            await _categoriser.CategoriseAsync(csv);
 
             Console.WriteLine("FINISHING BANK STATEMENT ANALYSIS");
-        }
-
-        public void ReadCsvFile()
-        {
-            _csvReader.ReadCsvFile("C:/Users/jyetr/Downloads/StatementCsv.csv");
         }
     }
 }
