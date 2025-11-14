@@ -1,31 +1,33 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 
 public class HuggingFaceCategoriser(IConfiguration _config) : IHuggingFaceCategoriser
 {
     private readonly string _apiKey = _config.GetValue<string>("HuggingFaceToken")
-        ?? throw new InvalidOperationException("Could not get user secrets");
+        ?? throw new InvalidOperationException("Error retrieving HuggingFaceToken");
 
     public async Task<string> CategoriseAsync()
     {
-        string model = "deepset/roberta-base-squad2";
         using var http = new HttpClient();
-        string url = $"https://router.huggingface.co/hf-inference/models/{model}";
+        string url = $"https://router.huggingface.co/hf-inference/models/facebook/bart-large-mnli";
 
         http.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _apiKey);
 
-        string json = """
+
+        string transaction = "WOOLWORTHS 4567 SUBIACO WA";
+        string[] labels = { "Groceries", "Fuel", "Rent", "Eating Out", "Bills", "Entertainment", "Transfer" };
+
+        string jsonPayload = """
         {
-          "inputs": {
-            "question": "What is my name?",
-            "context": "My name is Clara and I live in Berkeley."
-          }
+            "inputs": "Hi, I recently bought a device from your company but it is not working as advertised and I would like to get reimbursed!",
+            "parameters": {"candidate_labels": ["refund", "legal", "faq"]}
         }
         """;
 
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
         var response = await http.PostAsync(url, content);
         response.EnsureSuccessStatusCode();
