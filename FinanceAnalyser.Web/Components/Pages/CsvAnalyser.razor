@@ -1,0 +1,44 @@
+﻿@page "/"
+@using FinanceAnalyser.Web.Components.Upload
+@using FinanceAnalyser.Web.Models
+
+<MudContainer Height="100vh" Width="100%" Fixed="true">
+    <MudText Typo="Typo.h3">Upload a .csv file below</MudText>
+    <MudText Typo="Typo.body1">Please upload a .csv file for the application to analyse.</MudText>
+
+    <DragDropUpload UploadStatusChanged="OnUploadStatusChanged" FileUploaded="OnFileUploaded"/>
+
+    @if (uploadStatus == UploadStatus.Loading)
+    {
+        <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+    }
+
+    <MudToolBar Gutters="@false" Class="relative d-flex gap-4">
+        @if (uploadStatus == UploadStatus.Done)
+        {
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@GenerateGraph">
+                Generate Graph
+            </MudButton>
+        }
+    </MudToolBar>
+</MudContainer>
+
+@code {
+    private UploadStatus uploadStatus = UploadStatus.Empty;
+    private IBrowserFile? file = null;
+
+    private void OnUploadStatusChanged(UploadStatus newStatus)
+    {
+        uploadStatus = newStatus;
+    }
+
+    private void OnFileUploaded(IBrowserFile newFile)
+    {
+        file = newFile;
+    }
+
+    private void GenerateGraph()
+    {
+    }
+}
+

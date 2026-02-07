@@ -1,4 +1,5 @@
 ﻿@inject ISnackbar Snackbar
+@using FinanceAnalyser.Web.Models
 
 <style>
     .file-upload-input {
@@ -12,10 +13,9 @@
 </style>
 
 <MudStack Style="width: 100%">
-    <MudFileUpload T="IReadOnlyList<IBrowserFile>"
+    <MudFileUpload T="IBrowserFile"
                    @ref="@_fileUpload"
                    OnFilesChanged="OnInputFileChanged"
-                   AppendMultipleFiles
                    Hidden="@false"
                    InputClass="file-upload-input"
                    tabindex="-1"
@@ -24,69 +24,59 @@
                    @ondragleave="@ClearDragClass"
                    @ondragend="@ClearDragClass">
         <ActivatorContent>
-            <MudPaper Height="300px"
+            <MudPaper Height="10vh"
+                      Width="100%"
                       Outlined="true"
                       Class="@_dragClass">
-                <MudText Typo="Typo.h6">
-                    Drag and drop files here or click
+                <MudText Typo="Typo.h6" Align="Align.Center" Style="opacity: 70%">
+                    Drag and drop files here or click to open the file picker
                 </MudText>
-                @foreach (var file in _fileNames)
+                @if (!string.IsNullOrEmpty(_fileName))
                 {
                     <MudChip T="string"
                              Color="Color.Dark"
-                             Text="@file"
+                             Text="@_fileName"
                              tabindex="-1" />
                 }
             </MudPaper>
         </ActivatorContent>
     </MudFileUpload>
-    <MudToolBar Gutters="@false"
-                Class="relative d-flex justify-end gap-4">
-        <MudButton Color="Color.Primary"
-                   OnClick="@OpenFilePickerAsync"
-                   Variant="Variant.Filled">
-            Open file picker
-        </MudButton>
-        <MudButton Color="Color.Primary"
-                   Disabled="@(!_fileNames.Any())"
-                   OnClick="@Upload"
-                   Variant="Variant.Filled">
-            Upload
-        </MudButton>
-        <MudButton Color="Color.Error"
-                   Disabled="@(!_fileNames.Any())"
-                   OnClick="@ClearAsync"
-                   Variant="Variant.Filled">
-            Clear
-        </MudButton>
-    </MudToolBar>
 </MudStack>
 
 @code {
+
+    [Parameter]
+    public EventCallback<UploadStatus> UploadStatusChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<IBrowserFile> FileUploaded { get; set; }
+
 #nullable enable
     private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full";
     private string _dragClass = DefaultDragClass;
-    private readonly List<string> _fileNames = new();
-    private MudFileUpload<IReadOnlyList<IBrowserFile>>? _fileUpload;
+    private string _fileName = "";
+    private MudFileUpload<IBrowserFile>? _fileUpload;
 
     private async Task ClearAsync()
     {
         await (_fileUpload?.ClearAsync() ?? Task.CompletedTask);
-        _fileNames.Clear();
+        _fileName = "";
         ClearDragClass();
     }
 
     private Task OpenFilePickerAsync()
         => _fileUpload?.OpenFilePickerAsync() ?? Task.CompletedTask;
 
-    private void OnInputFileChanged(InputFileChangeEventArgs e)
+    private async Task OnInputFileChanged(InputFileChangeEventArgs e)
     {
+        await UploadStatusChanged.InvokeAsync(UploadStatus.Loading);
+
         ClearDragClass();
-        var files = e.GetMultipleFiles();
-        foreach (var file in files)
-        {
-            _fileNames.Add(file.Name);
-        }
+        var file = e.File;
+        _fileName = file.Name;
+        await FileUploaded.InvokeAsync(file);
+
+        await UploadStatusChanged.InvokeAsync(UploadStatus.Done);
     }
 
     private void Upload()
